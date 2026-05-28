@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>guestbook!!</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:,">
+</head>
+
+<body>
+
+    <div id="cursor">
+        <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="10,2 12,8 18,10 12,12 10,18 8,12 2,10 8,8" fill="#e8a0b0" stroke="#c07080"
+                stroke-width="1" />
+        </svg>
+    </div>
+    <div id="sparkles"></div>
+
+    <div id="layout">
+
+        <div id="banner">
+            <img src="./banner.webp" alt="banner" id="banner-img">
+        </div>
+
+        <div id="navbar">
+            <div id="gb-nav-controls">
+                <input type="color" id="gb-color" value="#7a3a4a">
+                <div id="gb-size-track">
+                    <input type="range" id="gb-pen-size" min="1" max="16" value="3">
+                </div>
+            </div>
+            <a href="/#homepage" class="nav-link">Home :3</a>
+            &nbsp;|&nbsp;
+            <a href="guestbook.html" class="nav-link active">Guestbook ^w^</a>
+            <span id="gb-nav-right">connectiting...</span>
+        </div>
+
+        <div id="gb-canvas-area">
+            <div id="gb-world">
+                <div id="gb-viewport-hint">scroll to explore</div>
+            </div>
+        </div>
+
+        <div id="footer">Haiii omaga ur reading the footer text >:3 btw (c) 2026</div>
+
+    </div>
+
+    <script type="module">
+        import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+        const supabase = createClient(
+            "https://gmgwincdfreawxtzwncc.supabase.co",
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZ3dpbmNkZnJlYXd4dHp3bmNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDA1OTUsImV4cCI6MjA5NTQ3NjU5NX0.w-gFEvJchg3EFe97XcK4VjX-7I5DhcWMXdt3oMnLOZA"
+        );
+
+        const TILE_W = 256, TILE_H = 96;
+        const COLS = 4;
+        const GAP = 12;
+        const DEFAULT_BG = "#fff5f7";
+        const UNDO_LIMIT = 50;
+
+        let userId = null;
+        let mySlot = null;
+        let tool = "pen";
+        let drawing = false;
+        let lastX = null, lastY = null;
+        let dirty = false;
+        let saveTimer = null;
+
+        let undoStack = [];
+        let redoStack = [];
+
+        let panning = false;
+        let panStartX = 0, panStartY = 0;
+        let panScrollX = 0, panScrollY = 0;
+        let panVelX = 0, panVelY = 0;
+        let panLastX = 0, panLastY = 0;
+        let panRafId = null;
+
+        let zoom = 1;
+        const ZOOM_MIN = 0.25;
+        const ZOOM_MAX = 8;
+        const ZOOM_STEP = 0.12;
+
+        const world = document.getElementById("gb-world");
+        const canvasArea = document.getElementById("gb-canvas-area");
+        const status = document.getElementById("gb-nav-right");
+        const hint = document.getElementById("gb-viewport-hint");
+        const colorPick = document.getElementById("gb-color");
+        const sizeSlider = document.getElementById("gb-pen-size");
+
+        function updateSliderFill() {
+            const pct = ((+sizeSlider.value - +sizeSlider.min) / (+sizeSlider.max - +sizeSlider.min) * 100).toFixed(1) + "%";
+            sizeSlider.style.setProperty("--fill", pct);
+        }
+        sizeSlider.addEventListener("input", updateSliderFill);
+        updateSliderFill();
+
+        const cursorEl = document.getElementById("cursor");
+        const sparkles = document.getElementById("sparkles");
+        const sparkChars = ["*", "+", "x", "o", "-", "^", "~"];
+        document.addEventListener("mousemove", e => {
+            cursorEl.style.left = e.clientX + "px";
+            cursorEl.style.top = e.clientY + "px";
+            if (Math.random() < 0.07) {
+                const s = document.createElement("span");
+                s.className = "sparkle";
+                s.textContent = sparkChars[Math.floor(Math.random() * sparkChars.length)];
+                s.style.left = e.clientX + "px";
+                s.style.top = e.clientY + "px";
+                sparkles.appendChild(s);
+                s.addEventListener("animationend", () => s.remove());
+            }
+        });
+
+        const WORLD_SIZE = 20000;
+        const ORIGIN_X = Math.floor(WORLD_SIZE / 2 - (COLS * (TILE_W + GAP)) / 2);
+        const ORIGIN_Y = Math.floor(WORLD_SIZE / 2 - (TILE_H + GAP) * 4);
+
+        world.style.width = WORLD_SIZE + "px";
+        world.style.height = WORLD_SIZE + "px";
+        world.style.transformOrigin = "0 0";
+        world.style.transform = `scale(${zoom})`;
+
+        function slotToXY(slot) {
+            return {
+                x: ORIGIN_X + (slot % COLS) * (TILE_W + GAP),
+                y: ORIGIN_Y + Math.floor(slot / COLS) * (TILE_H + GAP),
+            };
+        }
+
+        function imgSrcToImageData(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const tmp = document.createElement("canvas");
+                    tmp.width = TILE_W; tmp.height = TILE_H;
+                    const ctx = tmp.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                    resolve(ctx.getImageData(0, 0, TILE_W, TILE_H));
+                };
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        function canvasToLosslessDataURL(canvas) {
+            const webp = canvas.toDataURL("image/webp");
+            return webp.startsWith("data:image/webp") ? webp : canvas.toDataURL("image/png");
+        }
+
+        function createTileCanvas(slot, imageData) {
+            const { x, y } = slotToXY(slot);
+            const c = document.createElement("canvas");
+            c.width = TILE_W; c.height = TILE_H;
+            c.className = "gb-tile";
+            c.style.left = x + "px";
+            c.style.top = y + "px";
+            const ctx = c.getContext("2d");
+            if (imageData) { ctx.putImageData(imageData, 0, 0); }
+            else { ctx.fillStyle = DEFAULT_BG; ctx.fillRect(0, 0, TILE_W, TILE_H); }
+            world.appendChild(c);
+            return c;
+        }
+
+        let myCanvas = null, myCtx = null;
+
+        function createMyCanvas(slot) {
+            const { x, y } = slotToXY(slot);
+            myCanvas = document.createElement("canvas");
+            myCanvas.id = "gb-mine-canvas";
+            myCanvas.width = TILE_W; myCanvas.height = TILE_H;
+            myCanvas.classList.add("gb-tile", "gb-tile-mine");
+            myCanvas.style.left = x + "px";
+            myCanvas.style.top = y + "px";
+            world.appendChild(myCanvas);
+            myCtx = myCanvas.getContext("2d");
+        }
+
+        function loadMyImage(imageData) {
+            if (imageData) { myCtx.putImageData(imageData, 0, 0); }
+            else { myCtx.fillStyle = DEFAULT_BG; myCtx.fillRect(0, 0, TILE_W, TILE_H); }
+        }
+
+        function snapshotForUndo() {
+            undoStack.push(myCtx.getImageData(0, 0, TILE_W, TILE_H));
+            if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+            redoStack = [];
+        }
+
+        function undo() {
+            if (!undoStack.length) return;
+            redoStack.push(myCtx.getImageData(0, 0, TILE_W, TILE_H));
+            myCtx.putImageData(undoStack.pop(), 0, 0);
+            dirty = true; scheduleSave();
+        }
+
+        function redo() {
+            if (!redoStack.length) return;
+            undoStack.push(myCtx.getImageData(0, 0, TILE_W, TILE_H));
+            myCtx.putImageData(redoStack.pop(), 0, 0);
+            dirty = true; scheduleSave();
+        }
+
+        function clearCanvas() {
+            if (!myCanvas) return;
+            snapshotForUndo();
+            myCtx.fillStyle = DEFAULT_BG;
+            myCtx.fillRect(0, 0, TILE_W, TILE_H);
+            dirty = true; scheduleSave();
+        }
+
+        document.addEventListener("keydown", e => {
+            const ctrl = e.ctrlKey || e.metaKey;
+            if (e.key === "c" || e.key === "C") { e.preventDefault(); clearCanvas(); }
+            if (e.key === "f" || e.key === "F") { e.preventDefault(); scrollToMyTile(); }
+            if (!ctrl) return;
+            if (e.key === "z" || e.key === "Z") {
+                if (e.shiftKey) { e.preventDefault(); redo(); }
+                else { e.preventDefault(); undo(); }
+            }
+            if (e.key === "y" || e.key === "Y") { e.preventDefault(); redo(); }
+        });
+
+        function worldPosFromEvent(e) {
+            const rect = canvasArea.getBoundingClientRect();
+            return {
+                wx: (e.clientX - rect.left + canvasArea.scrollLeft) / zoom,
+                wy: (e.clientY - rect.top + canvasArea.scrollTop) / zoom,
+            };
+        }
+
+        function inMyTile(wx, wy) {
+            if (!myCanvas) return false;
+            const { x, y } = slotToXY(mySlot);
+            return wx >= x && wx < x + TILE_W && wy >= y && wy < y + TILE_H;
+        }
+
+        function drawAt(wx, wy, fromX, fromY) {
+            if (!myCanvas) return;
+            const { x: ox, y: oy } = slotToXY(mySlot);
+            const cx = wx - ox, cy = wy - oy;
+            myCtx.save();
+            myCtx.lineWidth = parseInt(sizeSlider.value, 10);
+            myCtx.lineCap = "round";
+            myCtx.lineJoin = "round";
+            myCtx.strokeStyle = (tool === "eraser") ? DEFAULT_BG : colorPick.value;
+            myCtx.globalCompositeOperation = "source-over";
+            myCtx.beginPath();
+            if (fromX !== null && fromY !== null) {
+                myCtx.moveTo(fromX - ox, fromY - oy);
+                myCtx.lineTo(cx, cy);
+            } else {
+                myCtx.moveTo(cx, cy);
+                myCtx.lineTo(cx, cy);
+            }
+            myCtx.stroke();
+            myCtx.restore();
+            dirty = true; scheduleSave();
+        }
+
+        function applyZoom(newZoom, pivotClientX, pivotClientY) {
+            newZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, newZoom));
+            if (newZoom === zoom) return;
+
+            const rect = canvasArea.getBoundingClientRect();
+            const wx = (pivotClientX - rect.left + canvasArea.scrollLeft) / zoom;
+            const wy = (pivotClientY - rect.top + canvasArea.scrollTop) / zoom;
+
+            zoom = newZoom;
+            world.style.transformOrigin = "0 0";
+            world.style.transform = `scale(${zoom})`;
+
+            canvasArea.scrollLeft = wx * zoom - (pivotClientX - rect.left);
+            canvasArea.scrollTop = wy * zoom - (pivotClientY - rect.top);
+        }
+
+        function scrollToMyTile() {
+            const { x, y } = slotToXY(mySlot);
+            canvasArea.scrollLeft = x * zoom + (TILE_W * zoom) / 2 - canvasArea.clientWidth / 2;
+            canvasArea.scrollTop = y * zoom + (TILE_H * zoom) / 2 - canvasArea.clientHeight / 2;
+            if (canvasArea.scrollLeft < 0) canvasArea.scrollLeft = 0;
+            if (canvasArea.scrollTop < 0) canvasArea.scrollTop = 0;
+        }
+
+        canvasArea.addEventListener("dragstart", e => e.preventDefault());
+        world.addEventListener("dragstart", e => e.preventDefault());
+
+        canvasArea.addEventListener("wheel", e => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
+            applyZoom(zoom + delta * zoom, e.clientX, e.clientY);
+        }, { passive: false });
+
+        function startMomentum() {
+            cancelAnimationFrame(panRafId);
+            const FRICTION = 0.85;
+            function tick() {
+                if (Math.abs(panVelX) < 0.3 && Math.abs(panVelY) < 0.3) return;
+                canvasArea.scrollLeft += panVelX;
+                canvasArea.scrollTop += panVelY;
+                panVelX *= FRICTION;
+                panVelY *= FRICTION;
+                panRafId = requestAnimationFrame(tick);
+            }
+            panRafId = requestAnimationFrame(tick);
+        }
+
+        canvasArea.addEventListener("mousedown", e => {
+            e.preventDefault();
+            cancelAnimationFrame(panRafId);
+            panVelX = 0; panVelY = 0;
+            const { wx, wy } = worldPosFromEvent(e);
+            if (inMyTile(wx, wy)) {
+                tool = e.button === 2 ? "eraser" : "pen";
+                snapshotForUndo();
+                drawing = true;
+                drawAt(wx, wy, null, null);
+                lastX = wx; lastY = wy;
+            } else {
+                panning = true;
+                panStartX = e.clientX;
+                panStartY = e.clientY;
+                panScrollX = canvasArea.scrollLeft;
+                panScrollY = canvasArea.scrollTop;
+                panLastX = e.clientX;
+                panLastY = e.clientY;
+            }
+        });
+
+        canvasArea.addEventListener("mousemove", e => {
+            if (drawing) {
+                const { wx, wy } = worldPosFromEvent(e);
+                drawAt(wx, wy, lastX, lastY);
+                lastX = wx; lastY = wy;
+            } else if (panning) {
+                panVelX = -(e.clientX - panLastX);
+                panVelY = -(e.clientY - panLastY);
+                panLastX = e.clientX;
+                panLastY = e.clientY;
+                canvasArea.scrollLeft = panScrollX - (e.clientX - panStartX);
+                canvasArea.scrollTop = panScrollY - (e.clientY - panStartY);
+            }
+        });
+
+        function stopDraw() { drawing = false; lastX = null; lastY = null; }
+        function stopPan() {
+            if (panning) { panning = false; startMomentum(); }
+        }
+
+        canvasArea.addEventListener("mouseup", () => { stopDraw(); stopPan(); });
+        canvasArea.addEventListener("mouseleave", () => { stopDraw(); stopPan(); });
+        canvasArea.addEventListener("contextmenu", e => e.preventDefault());
+
+        function scheduleSave() {
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveMyTile, 1500);
+        }
+
+        async function saveMyTile() {
+            if (!dirty || !myCanvas || userId === null) return;
+            dirty = false;
+            status.textContent = "saving...";
+            try {
+                const { error } = await supabase.from("tiles").upsert({
+                    user_id: userId,
+                    image: canvasToLosslessDataURL(myCanvas),
+                    slot: mySlot,
+                });
+                if (error) throw error;
+                status.textContent = "saved >_<";
+            } catch (err) {
+                console.error(err);
+                dirty = true;
+                status.textContent = "save failed :(";
+            }
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") saveMyTile();
+        });
+        window.addEventListener("pagehide", saveMyTile);
+        window.addEventListener("beforeunload", saveMyTile);
+
+        function flashHint() {
+            hint.classList.add("show");
+            setTimeout(() => hint.classList.remove("show"), 3000);
+        }
+
+        async function init() {
+            status.textContent = "connectiting...";
+
+            let { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                await supabase.auth.signInAnonymously();
+                ({ data: { session } } = await supabase.auth.getSession());
+            }
+            userId = session.user.id;
+
+            const { data: rows, error } = await supabase
+                .from("tiles")
+                .select("user_id, image, slot")
+                .order("slot", { ascending: true });
+
+            if (error) { status.textContent = "error :("; console.error(error); return; }
+
+            const myRow = rows.find(r => r.user_id === userId);
+            const maxSlot = rows.reduce((m, r) => Math.max(m, r.slot ?? -1), -1);
+            mySlot = (myRow && myRow.slot !== null) ? myRow.slot : maxSlot + 1;
+
+
+
+            for (const row of rows) {
+                if (row.user_id === userId || row.slot === null) continue;
+                const finish = id => { const c = createTileCanvas(row.slot, id); c.dataset.uid = row.user_id; };
+                if (row.image) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
+                else { finish(null); }
+            }
+
+            createMyCanvas(mySlot);
+
+            if (myRow && myRow.image) {
+                imgSrcToImageData(myRow.image).then(id => loadMyImage(id)).catch(() => loadMyImage(null));
+            } else {
+                loadMyImage(null);
+            }
+
+            status.textContent = "readyy";
+            flashHint();
+
+            requestAnimationFrame(scrollToMyTile);
+
+            supabase.channel("tiles-channel")
+                .on("postgres_changes", { event: "*", schema: "public", table: "tiles" }, payload => {
+                    const row = payload.new;
+                    if (!row || row.user_id === userId || row.slot === null) return;
+                    world.querySelectorAll(".gb-tile:not(#gb-mine-canvas)").forEach(c => {
+                        if (c.dataset.uid === row.user_id) c.remove();
+                    });
+
+                    const finish = id => { const c = createTileCanvas(row.slot, id); c.dataset.uid = row.user_id; };
+                    if (row.image) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
+                    else { finish(null); }
+                })
+                .subscribe();
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
