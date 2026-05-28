@@ -49,6 +49,7 @@
 
     <script type="module">
         import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+        import pako from "https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.esm.mjs";
 
         const supabase = createClient(
             "https://gmgwincdfreawxtzwncc.supabase.co",
@@ -56,7 +57,6 @@
         );
 
         const TILE_W = 256, TILE_H = 96;
-        const COLS = 4;
         const GAP = 12;
         const DEFAULT_BG = "#fff5f7";
         const UNDO_LIMIT = 50;
@@ -84,6 +84,8 @@
         const ZOOM_MAX = 8;
         const ZOOM_STEP = 0.12;
 
+        const tileByUid = new Map();
+
         const world = document.getElementById("gb-world");
         const canvasArea = document.getElementById("gb-canvas-area");
         const status = document.getElementById("gb-nav-right");
@@ -98,26 +100,22 @@
         sizeSlider.addEventListener("input", updateSliderFill);
         updateSliderFill();
 
-        const cursorEl = document.getElementById("cursor");
-        const sparkles = document.getElementById("sparkles");
-        const sparkChars = ["*", "+", "x", "o", "-", "^", "~"];
-        document.addEventListener("mousemove", e => {
-            cursorEl.style.left = e.clientX + "px";
-            cursorEl.style.top = e.clientY + "px";
-            if (Math.random() < 0.07) {
-                const s = document.createElement("span");
-                s.className = "sparkle";
-                s.textContent = sparkChars[Math.floor(Math.random() * sparkChars.length)];
-                s.style.left = e.clientX + "px";
-                s.style.top = e.clientY + "px";
-                sparkles.appendChild(s);
-                s.addEventListener("animationend", () => s.remove());
-            }
+        window.addEventListener("load", () => {
+            requestIdleCallback(async () => {
+                const wait = (min, max) =>
+                    new Promise(r => setTimeout(r, Math.random() * (max - min) + min));
+
+                await wait(100, 600);
+                console.log("[server] hmm bobby");
+                await wait(100, 600);
+                const fullUrl = new URL("./bobby.gif", window.location.href).href;
+                console.log("[client]", fullUrl);
+            });
         });
 
         const WORLD_SIZE = 20000;
-        const ORIGIN_X = Math.floor(WORLD_SIZE / 2 - (COLS * (TILE_W + GAP)) / 2);
-        const ORIGIN_Y = Math.floor(WORLD_SIZE / 2 - (TILE_H + GAP) * 4);
+        const ORIGIN_X = Math.floor(WORLD_SIZE / 2 - TILE_W / 2);
+        const ORIGIN_Y = Math.floor(WORLD_SIZE / 2 - TILE_H / 2);
 
         world.style.width = WORLD_SIZE + "px";
         world.style.height = WORLD_SIZE + "px";
@@ -125,33 +123,78 @@
         world.style.transform = `scale(${zoom})`;
 
         function slotToXY(slot) {
+            if (slot === 0) return { x: ORIGIN_X, y: ORIGIN_Y };
+
+            let x = 0, y = 0;
+            let dx = 1, dy = 0;
+            let steps = 1;
+            let stepCount = 0;
+            let turns = 0;
+            let i = 0;
+
+            while (i < slot) {
+                x += dx; y += dy;
+                i++;
+                if (i === slot) break;
+                stepCount++;
+                if (stepCount === steps) {
+                    stepCount = 0;
+                    [dx, dy] = [dy, -dx];
+                    turns++;
+                    if (turns % 2 === 0) steps++;
+                }
+            }
+
             return {
-                x: ORIGIN_X + (slot % COLS) * (TILE_W + GAP),
-                y: ORIGIN_Y + Math.floor(slot / COLS) * (TILE_H + GAP),
+                x: ORIGIN_X + x * (TILE_W + GAP),
+                y: ORIGIN_Y + y * (TILE_H + GAP),
             };
+        }
+
+        function uint8ToBase64(bytes) {
+            let str = "";
+            const CHUNK = 0x8000;
+            for (let i = 0; i < bytes.length; i += CHUNK)
+                str += String.fromCharCode(...bytes.subarray(i, i + CHUNK));
+            return btoa(str);
+        }
+
+        function base64ToUint8(b64) {
+            const binary = atob(b64);
+            const out = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
+            return out;
         }
 
         function imgSrcToImageData(src) {
             return new Promise((resolve, reject) => {
+                if (src.startsWith("rawrgba:")) {
+                    const bytes = base64ToUint8(src.slice(8));
+                    const raw = pako.inflate(bytes);
+                    resolve(new ImageData(new Uint8ClampedArray(raw.buffer), TILE_W, TILE_H));
+                    return;
+                }
                 const img = new Image();
                 img.onload = () => {
                     const tmp = document.createElement("canvas");
                     tmp.width = TILE_W; tmp.height = TILE_H;
-                    const ctx = tmp.getContext("2d");
-                    ctx.drawImage(img, 0, 0);
-                    resolve(ctx.getImageData(0, 0, TILE_W, TILE_H));
+                    const tmpCtx = tmp.getContext("2d", { willReadFrequently: true });
+                    tmpCtx.drawImage(img, 0, 0);
+                    resolve(tmpCtx.getImageData(0, 0, TILE_W, TILE_H));
                 };
                 img.onerror = reject;
                 img.src = src;
             });
         }
 
-        function canvasToLosslessDataURL(canvas) {
-            const webp = canvas.toDataURL("image/webp");
-            return webp.startsWith("data:image/webp") ? webp : canvas.toDataURL("image/png");
+        async function canvasToLosslessDataURL(canvas) {
+            const ctx = canvas.getContext("2d");
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const compressed = pako.deflate(imageData.data);
+            return "rawrgba:" + uint8ToBase64(compressed);
         }
 
-        function createTileCanvas(slot, imageData) {
+        function createTileCanvas(slot, imageData, uid) {
             const { x, y } = slotToXY(slot);
             const c = document.createElement("canvas");
             c.width = TILE_W; c.height = TILE_H;
@@ -162,6 +205,7 @@
             if (imageData) { ctx.putImageData(imageData, 0, 0); }
             else { ctx.fillStyle = DEFAULT_BG; ctx.fillRect(0, 0, TILE_W, TILE_H); }
             world.appendChild(c);
+            if (uid) { c.dataset.uid = uid; tileByUid.set(uid, c); }
             return c;
         }
 
@@ -176,7 +220,7 @@
             myCanvas.style.left = x + "px";
             myCanvas.style.top = y + "px";
             world.appendChild(myCanvas);
-            myCtx = myCanvas.getContext("2d");
+            myCtx = myCanvas.getContext("2d", { willReadFrequently: true });
         }
 
         function loadMyImage(imageData) {
@@ -308,6 +352,9 @@
             panRafId = requestAnimationFrame(tick);
         }
 
+        let drawPending = false;
+        let pendingWx = 0, pendingWy = 0;
+
         canvasArea.addEventListener("mousedown", e => {
             e.preventDefault();
             cancelAnimationFrame(panRafId);
@@ -333,8 +380,15 @@
         canvasArea.addEventListener("mousemove", e => {
             if (drawing) {
                 const { wx, wy } = worldPosFromEvent(e);
-                drawAt(wx, wy, lastX, lastY);
-                lastX = wx; lastY = wy;
+                pendingWx = wx; pendingWy = wy;
+                if (!drawPending) {
+                    drawPending = true;
+                    requestAnimationFrame(() => {
+                        drawAt(pendingWx, pendingWy, lastX, lastY);
+                        lastX = pendingWx; lastY = pendingWy;
+                        drawPending = false;
+                    });
+                }
             } else if (panning) {
                 panVelX = -(e.clientX - panLastX);
                 panVelY = -(e.clientY - panLastY);
@@ -359,6 +413,14 @@
             saveTimer = setTimeout(saveMyTile, 1500);
         }
 
+        function isValidImage(src) {
+            return typeof src === "string" && (
+                src.startsWith("rawrgba:") ||
+                src.startsWith("data:") ||
+                src.startsWith("http")
+            );
+        }
+
         async function saveMyTile() {
             if (!dirty || !myCanvas || userId === null) return;
             dirty = false;
@@ -366,7 +428,7 @@
             try {
                 const { error } = await supabase.from("tiles").upsert({
                     user_id: userId,
-                    image: canvasToLosslessDataURL(myCanvas),
+                    image: await canvasToLosslessDataURL(myCanvas),
                     slot: mySlot,
                 });
                 if (error) throw error;
@@ -410,19 +472,23 @@
             const maxSlot = rows.reduce((m, r) => Math.max(m, r.slot ?? -1), -1);
             mySlot = (myRow && myRow.slot !== null) ? myRow.slot : maxSlot + 1;
 
-
-
             for (const row of rows) {
                 if (row.user_id === userId || row.slot === null) continue;
-                const finish = id => { const c = createTileCanvas(row.slot, id); c.dataset.uid = row.user_id; };
-                if (row.image) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
+                const finish = id => { createTileCanvas(row.slot, id, row.user_id); };
+                if (isValidImage(row.image)) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
                 else { finish(null); }
             }
 
             createMyCanvas(mySlot);
 
             if (myRow && myRow.image) {
-                imgSrcToImageData(myRow.image).then(id => loadMyImage(id)).catch(() => loadMyImage(null));
+                imgSrcToImageData(myRow.image).then(id => {
+                    loadMyImage(id);
+                    if (!myRow.image.startsWith("rawrgba:")) {
+                        dirty = true;
+                        scheduleSave();
+                    }
+                }).catch(() => loadMyImage(null));
             } else {
                 loadMyImage(null);
             }
@@ -436,12 +502,12 @@
                 .on("postgres_changes", { event: "*", schema: "public", table: "tiles" }, payload => {
                     const row = payload.new;
                     if (!row || row.user_id === userId || row.slot === null) return;
-                    world.querySelectorAll(".gb-tile:not(#gb-mine-canvas)").forEach(c => {
-                        if (c.dataset.uid === row.user_id) c.remove();
-                    });
 
-                    const finish = id => { const c = createTileCanvas(row.slot, id); c.dataset.uid = row.user_id; };
-                    if (row.image) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
+                    const existing = tileByUid.get(row.user_id);
+                    if (existing) { existing.remove(); tileByUid.delete(row.user_id); }
+
+                    const finish = id => { createTileCanvas(row.slot, id, row.user_id); };
+                    if (isValidImage(row.image)) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
                     else { finish(null); }
                 })
                 .subscribe();
@@ -449,6 +515,7 @@
 
         init();
     </script>
+    <script src="cursor.js"></script>
 </body>
 
 </html>

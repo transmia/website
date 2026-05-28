@@ -1,33 +1,36 @@
 # HOMEPAGEE
 
-Hiiii im *Azuri* and this is my cute little website :33
+Hiiii im *Mia* and this is my cute little website :33
 
-## Why did you transition
+## Why are you trans
 
-Yeah so i was a normal dude at start but then em my friends started joking that im a femboy but then i went full on femboyy mode but then i realised i wanted boobiess <3 so here i am
+*[gender dysphoria](https://en.wikipedia.org/wiki/Gender_dysphoria)*  
 
-## Why da hell Azuri??
+## Why did you choose Mia??
 
-As you might know im Azuri and i got my name well basically when i was first playing [DDLC](https://ddlc.moe/) they wanted a name from me and since i was just starting my transitioning journey i couldnt put my usual names so i picked this one!! yeah thats all
+idk i like it it may change in the future ;w;
 
 ## Who are you really?
 
 Anonymous :3
+you can definitelly track me down thru bunch of platforms i surely have a big digital footprint but youre lazy you arent going to do that. right??  
+please donntt
 
-## What are you pronouns?
+## What are your pronouns
 
 **She/her** but you can use **any/all** (as in any i dont care not literally *any*)
 
 ## What do you do?
 
 Im a programmerr i mainly use Rust the femboy lang and also im a student so nothing much  
-yea and also i shoot families with a 9mm
+yea and also i shoot people with a 9mm
 <span class="spoiler">lens what did you thought (NIKON MY BELOVED)</span>
 
 ## music?
 
 omaga takanaka i love you
+and ANRI ofcourse and momoko kikuchi and bunch of more
 
 ##
 
-azuri azuri azuri azuri azuri azuri azuri azuri azuri azuri azuri azuri
+cat
