@@ -1,5 +1,12 @@
 # RANTSS (or blog)
 
+## polysterene brick - 4.6.2026
+
+reset the sh counter
+i got a little angy :3 today and emm stuff happened
+i cut down a tree with an axe because i thought it would be the best way to release it
+aand about dysphoria its the worst it has ever been i really cant continue
+
 ## second here? - 3.6.2026
 
 Em im sorry for not posting i was too lazy :p
