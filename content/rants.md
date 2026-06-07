@@ -1,5 +1,15 @@
 # RANTSS (or blog)
 
+## matcha &middot; citrus - 7.6.2026
+
+okay hii im sorry for not posting on the weekend  
+soo em on friday i made a [super cute bracelet](./images/IMG0001.webp) and thats about it for friday  
+yesterday  i went to buy the skirt and i bought a shirt and a belt too!!  
+it was overall a good day and i had an sleepover with the friendd.
+aaand today it was just a filler day mom wanted me to go somewhere and thats
+basically all now im here  
+oki byeee!!
+
 ## polysterene brick - 4.6.2026
 
 reset the sh counter  
