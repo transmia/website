@@ -1,5 +1,12 @@
 # RANTSS (or blog)
 
+## felix - 11.6.2026
+
+i was outside with my new friend today  
+OMAGA HES SO FUCKING COOL I LITERALLY LOVE HIM  
+we were basically just swinging on a swing and talking  
+but like you get it just be happy for me
+
 ## matcha &middot; citrus - 7.6.2026
 
 okay hii im sorry for not posting on the weekend  
@@ -30,7 +37,7 @@ aand also out seventh hour was cancelled AGAIN for tomoroww
 sooo thats good  
 oki thats all i guess i will try to get back more often!
 
-## First here - 28.5.2026
+## first here - 28.5.2026
 
 Im starting this "blog"!  
 Yea em idk today out 7th hour was CANCELLED YAYY  
