@@ -1,5 +1,16 @@
 # RANTSS (or blog)
 
+## mount manin - 21.6.2026
+
+hii again sorry that i wasnt posting i have a boring life  
+in these 10 days well basically i went with felix on mount manin which is right here  
+in our town and it was good its the highest mountain in the city and i wasnt up there for ages  
+okay but that was a week ago this week literally NOTHING happened it was boring as hell  
+and dysphoria update is that i have top dysphoria more often and worse i dont like it  
+im planning on going to the thrift shop we have here in town tommorow and buy some tops 
+to fight dysphoria  
+wish me luck
+
 ## felix - 11.6.2026
 
 i was outside with my new friend today  
