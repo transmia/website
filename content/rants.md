@@ -1,5 +1,17 @@
 # RANTSS (or blog)
 
+## bracelet of theseus - 22.6.2026
+
+nothing today as usual but after school i went to tesco and the bracelet broke (for the second time) so
+i put it into my pocket and at home i went to repair it. since its just a bunch of strings together i can replace only the 
+broken one. which got me thinking: since the bracelet has 21 strings, and i already broke two of them, that means
+that after about 75 more broken strings (using [$E(n) \sim n \ln(n) + \gamma n$](https://en.wikipedia.org/wiki/Coupon_collector_problem), actually it uses my FAVORITE constant, [Euler-Mascheroni constant](https://en.wikipedia.org/wiki/Euler_Mascheroni_constant)) the bracelet would become entirerly NEW strings  
+leaving the question: [*is it actually still the same bracelet or a completely new one?
+and what if i took the broken strings and tied them up again to make another one?
+which one is the original?*](https://en.wikipedia.org/wiki/Ship_of_Theseus)  
+and another calculation, ive observed that one string breaks at average of 7.5 days, meaning ill tell you after 563 days.
+oki byee!!
+
 ## mount manin - 21.6.2026
 
 hii again sorry that i wasnt posting i have a boring life  

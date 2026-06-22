@@ -24,8 +24,10 @@ async function loadPage(file, pushState = true) {
     if (!res.ok) throw new Error();
     inner.innerHTML = marked.parse(await res.text());
     initSpoilers();
+    if (window.MathJax) {
+      await MathJax.typesetPromise([inner]);
+    }
     document.getElementById('content-area').scrollTop = 0;
-
     inner.querySelectorAll('a[href]').forEach(a => {
       if (a.hostname && a.hostname !== location.hostname) {
         a.target = '_blank';
@@ -35,11 +37,9 @@ async function loadPage(file, pushState = true) {
   } catch {
     inner.innerHTML = 'could not load file :(';
   }
-
   document.querySelectorAll('.nav-link').forEach(l => {
     l.classList.toggle('active', l.dataset.file === file);
   });
-
   if (pushState) {
     const page = file.replace(/\.md$/, '');
     history.pushState(null, '', '#' + page);
