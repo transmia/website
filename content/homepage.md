@@ -22,14 +22,15 @@ please donntt
 
 ## What do you do?
 
-Im a programmerr i mainly use Rust the femboy lang and also im a student so nothing much  
+Im a programmerr i mainly use Rust the femboy lang and C, also im a student so nothing much  
 yea and also i shoot people with a 9mm
 <span class="spoiler">lens what did you thought (NIKON MY BELOVED)</span>
 
 ## music?
 
 omaga takanaka i love you
-and ANRI ofcourse and momoko kikuchi and bunch of more
+and ANRI ofcourse and momoko kikuchi and bunch of more  
+[*olympic*](https://en.wikipedia.org/wiki/Olympic_(band))
 
 ##
 
