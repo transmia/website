@@ -1,5 +1,13 @@
 # RANTSS (or blog)
 
+## tete - 23.6.2026
+
+i have a friend that we call TeTe, and she wears those tshirts with wide head holes but instead of them on one shoulder she has it leveled out.  
+i liked her when she was at our school (mostly liked her style and she was cute) and decided to try to wear a shirt like she did.  
+IT IS GREAT i love it  
+i also went to buy the top today i forgot to tell u yesterday i couldnt for some reasons  
+oki yea thats all!!
+
 ## bracelet of theseus - 22.6.2026
 
 nothing today as usual but after school i went to tesco and the bracelet broke (for the second time) so

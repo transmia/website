@@ -391,3 +391,9 @@ li::before {
   text-align: center;
   letter-spacing: 0.03em;
 }
+
+@media (hover: none), (pointer: coarse) {
+    #cursor {
+        display: none;
+    }
+}
