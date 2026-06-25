@@ -39,4 +39,5 @@ Not necessarelly sorted <3
 ## Other
 
 - [Guestbook](./guestbook.html)
+- [Devlog](#devlog)
 - [Stickers](./stickers/)

@@ -1,5 +1,13 @@
 # RANTSS (or blog)
 
+## robotics - 25.6.2026
+
+haiiii!! my friend invited me to their robotics club at a university soo i will be going there the next year!!
+YAYYY ill finally have something to do and meet new people >w<  
+also my mom has birthday today so happy birthday to her everyone  
+i feel cute rn but ik its just because i dont see my face  
+oki byee
+
 ## tete - 23.6.2026
 
 i have a friend that we call TeTe, and she wears those tshirts with wide head holes but instead of them on one shoulder she has it leveled out.  
