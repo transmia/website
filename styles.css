@@ -149,6 +149,17 @@ body {
   font-style: italic;
 }
 
+#content-inner img,
+#content-inner video {
+    display: block;
+    max-width: 100%;
+    max-height: calc(100vh - 69px);
+    width: auto;
+    height: auto;
+    margin: 5px auto;
+    object-fit: contain;
+}
+
 #footer {
   background-color: #f9c0cb;
   border: 1px solid #d4a0aa;

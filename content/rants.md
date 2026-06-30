@@ -1,5 +1,19 @@
 # RANTSS (or blog)
 
+## versions - 30.6.2026
+
+i hate myself even more  
+i feel useless
+my friend literally told me "i dont want to say we dont need you but we dont need you"  
+after we planned it for like a month  
+he just took someone else  
+and i met my classmates i was good friend with for a long time and i thought i still was in a restaurant and they
+told me that they didnt invite me because it was last second planned like yeah sure but i give them the benefit of the doubt  
+i hope i dont wake up  
+  
+versions of myself  
+[IMG1](./images/#4)
+
 ## eva - 26.6.2026
 
 i feel fucking misserable i just want to fucking die i hate everything here  
