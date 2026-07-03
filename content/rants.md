@@ -1,5 +1,15 @@
 # RANTSS (or blog)
 
+## stockholm - 3.7.2026
+
+im in stockholm  
+i dont want to be here  
+were going back on tuesday  
+i dont know how to feel my mood changes literally every 15 minutes  
+im happy then im neutral then i feel cute then i wanna kill myself then i want to kill myself but for a different reason
+then im horny then im sad again then im idk what and etc  
+but im always so miserable.  
+
 ## versions - 30.6.2026
 
 i hate myself even more  
