@@ -1,5 +1,16 @@
 # RANTSS (or blog)
 
+## rick astley - 6.7.2026
+
+happy birthday to my classmate Igor  
+yeah em idk were getting home from stockholm tomorow soo yay i guess  
+and i found anri vinyl at the store but i didnt have money and when i came back with money they SOLD IT :(  
+can you believe that
+also i wanted to buy tubular bells and they had them but they said they werent on sale :/  
+so i bought rick roll  
+thats all im really boring  
+goodnight
+
 ## stockholm - 3.7.2026
 
 im in stockholm  
