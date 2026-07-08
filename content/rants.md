@@ -1,5 +1,14 @@
 # RANTSS (or blog)
 
+## my dad - 8.7.2026
+
+my dad is so fucking alcoholic hes fucking almost bipolar  
+like no please fucking he needs to realize he just cant keep doing this  
+when i told him he just called me bunch of slurs and said were "done"  
+and he was texting the lyrics of roses by outkast meanwhile calling me slurs  
+i hate myself so fucking much my whole arm is cut  
+atleast my skin regenerates really good and i dont have any skars from it  
+
 ## rick astley - 6.7.2026
 
 happy birthday to my classmate Igor  
