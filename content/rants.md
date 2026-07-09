@@ -1,5 +1,17 @@
 # RANTSS (or blog)
 
+## 100% grape extract - 9.7.2026
+
+i feel that im annoying my best friend too much  
+i sent him so much stuff today and yesterday  
+and he didnt even answer to nothing all he sent for the two days was a reel and "Gn" and video and another text  
+so much stuff i mean like some reels some photos of me (he liked ONE and ignored others) and
+just text messages
+i wanted to go out with him but he sent a video with his other friends and "sorryy"
+but it may not be i dont know  
+i hope he still takes me as his hg  
+[IMG1](./images/#5) | [IMG2](./images/#6)
+
 ## my dad - 8.7.2026
 
 my dad is so fucking alcoholic hes fucking almost bipolar  
