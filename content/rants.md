@@ -1,5 +1,14 @@
 # RANTSS (or blog)
 
+## first time - 14.7.2026
+
+haiiiii im first time druunk its sooooo goood i have to do it again sometimes  
+i was with my friend and a very cute lesbian couple omg i llove theeem  
+i hope they dont mind me sharing this info  
+omaga  
+i dont want to dieeeeeeeeeeeeeee
+i dont htink i can even commit this  
+
 ## 100% grape extract - 9.7.2026
 
 i feel that im annoying my best friend too much  

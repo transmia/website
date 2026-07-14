@@ -78,3 +78,30 @@ function loadFromHash() {
 
 window.addEventListener('hashchange', () => loadFromHash());
 loadFromHash();
+
+(function () {
+    var SUPABASE_URL = 'https://gmgwincdfreawxtzwncc.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdtZ3dpbmNkZnJlYXd4dHp3bmNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDA1OTUsImV4cCI6MjA5NTQ3NjU5NX0.w-gFEvJchg3EFe97XcK4VjX-7I5DhcWMXdt3oMnLOZA';
+    var STORAGE_KEY  = '_ka_ts';
+    var THREE_DAYS   = 3 * 24 * 60 * 60 * 1000;
+
+    function ping() {
+        fetch(SUPABASE_URL + '/rest/v1/keepalive?id=eq.1', {
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': 'Bearer ' + SUPABASE_KEY,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ pinged_at: new Date().toISOString() })
+        }).then(function () {
+            try { localStorage.setItem(STORAGE_KEY, Date.now().toString()); } catch (_) {}
+        }).catch(function () {});
+    }
+
+    try {
+        var last = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+        if (Date.now() - last >= THREE_DAYS) ping();
+    } catch (_) { ping(); }
+})();
