@@ -1,75 +1,81 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="UTF-8">
-  <title>image view :3</title>
-  <link rel="stylesheet" href="../styles.css">
-  <link rel="icon" href="data:,">
+	<meta charset="UTF-8">
+	<title>image view :3</title>
+	<link rel="stylesheet" href="../styles.css">
+	<link rel="icon" href="data:,">
+	<meta name="robots" content="noindex,nofollow,noarchive">
+	<meta name="googlebot" content="noindex,nofollow">
 </head>
+
 <body>
-  <div id="cursor">
-    <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="10,2 12,8 18,10 12,12 10,18 8,12 2,10 8,8" fill="#e8a0b0" stroke="#c07080" stroke-width="1" />
-    </svg>
-  </div>
-  <div id="sparkles"></div>
-  <div id="layout">
-    <div id="navbar">
-      <a href="../#homepage" class="nav-link">Home :3</a>
-      &nbsp;|&nbsp;
-      <a href="../#rants" class="nav-link">My everyday rants &lt;3</a>
-      &nbsp;|&nbsp;
-      <span class="nav-link active">Image view</span>
-    </div>
-    <div id="content-area" id="img-content-area">
-      <div id="img-viewer">
-        <div id="img-wrap">
-          <img id="img-display" src="" alt="">
-          <div id="img-error" style="display:none;">could not load image :(</div>
-        </div>
-        <div id="img-label"></div>
-      </div>
-    </div>
-    <div id="footer">Haiii omaga ur reading the footer text >:3 btw (c) 2026</div>
-  </div>
-  <script src="../cursor.js"></script>
-  <script>
-    function pad(n) {
-      return String(n).padStart(4, '0');
-    }
+	<div id="cursor">
+		<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+			<polygon points="10,2 12,8 18,10 12,12 10,18 8,12 2,10 8,8" fill="#e8a0b0" stroke="#c07080"
+				stroke-width="1" />
+		</svg>
+	</div>
+	<div id="sparkles"></div>
+	<div id="layout">
+		<div id="navbar">
+			<a href="../#homepage" class="nav-link">Home :3</a>
+			&nbsp;|&nbsp;
+			<a href="../#rants" class="nav-link">My everyday rants &lt;3</a>
+			&nbsp;|&nbsp;
+			<span class="nav-link active">Image view</span>
+		</div>
+		<div id="content-area" id="img-content-area">
+			<div id="img-viewer">
+				<div id="img-wrap">
+					<img id="img-display" src="" alt="">
+					<div id="img-error" style="display:none;">could not load image :(</div>
+				</div>
+				<div id="img-label"></div>
+			</div>
+		</div>
+		<div id="footer">Haiii omaga ur reading the footer text >:3 btw (c) 2026</div>
+	</div>
+	<script src="../cursor.js"></script>
+	<script>
+		function pad(n) {
+			return String(n).padStart(4, '0');
+		}
 
-    function loadImage() {
-      const hash = location.hash.slice(1);
-      const num = parseInt(hash, 10);
-      const img = document.getElementById('img-display');
-      const err = document.getElementById('img-error');
-      const label = document.getElementById('img-label');
+		function loadImage() {
+			const hash = location.hash.slice(1);
+			const num = parseInt(hash, 10);
+			const img = document.getElementById('img-display');
+			const err = document.getElementById('img-error');
+			const label = document.getElementById('img-label');
 
-      if (!hash || isNaN(num)) {
-        img.style.display = 'none';
-        err.style.display = 'block';
-        err.textContent = 'no image specified — try images/#1';
-        label.textContent = '';
-        return;
-      }
+			if (!hash || isNaN(num)) {
+				img.style.display = 'none';
+				err.style.display = 'block';
+				err.textContent = 'no image specified — try images/#1';
+				label.textContent = '';
+				return;
+			}
 
-      const filename = `./IMG${pad(num)}.webp`;
-      label.textContent = `IMG${pad(num)}.webp`;
-      img.style.display = 'block';
-      err.style.display = 'none';
-      document.title = `image view of ${num}. :3`
+			const filename = `./IMG${pad(num)}.webp`;
+			label.textContent = `IMG${pad(num)}.webp`;
+			img.style.display = 'block';
+			err.style.display = 'none';
+			document.title = `image view of ${num}. :3`
 
-      img.onload = null;
-      img.onerror = () => {
-        img.style.display = 'none';
-        err.style.display = 'block';
-        err.textContent = `could not load ${filename} :(`;
-      };
-      img.src = filename;
-    }
+			img.onload = null;
+			img.onerror = () => {
+				img.style.display = 'none';
+				err.style.display = 'block';
+				err.textContent = `could not load ${filename} :(`;
+			};
+			img.src = filename;
+		}
 
-    window.addEventListener('hashchange', loadImage);
-    loadImage();
-  </script>
+		window.addEventListener('hashchange', loadImage);
+		loadImage();
+	</script>
 </body>
+
 </html>
