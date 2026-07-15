@@ -1,14 +1,5 @@
 # RANTSS (or blog)
 
-## 15.7.2026
-
-i usually write these at the end of the day  
-and i usually put a header  
-i fucked up so much i fukced up all friendships im a failure  
-im going to run away from home and then ill probably kill myself somehow  
-i know ill be missed  
-ii love you all  
-
 ## first time - 14.7.2026
 
 haiiiii im first time druunk its sooooo goood i have to do it again sometimes  
