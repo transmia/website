@@ -1,5 +1,14 @@
 # RANTSS (or blog)
 
+## im back!! - 7.8.2026
+
+heloooo im baack im so sorry i wasnt posting  
+em so what happened is i dont really know i just didnt feel like it  
+BUT i have good news!  
+i have a new friend!
+and i shaved my legs and dyed my fingernails!  
+i feel like im making progress  
+
 ## first time - 14.7.2026
 
 haiiiii im first time druunk its sooooo goood i have to do it again sometimes  

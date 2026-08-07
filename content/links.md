@@ -22,7 +22,7 @@ Not necessarelly sorted <3
 - [Ferris (Happy version)](https://rustacean.net/)
 - [Trust its the 5G towers](https://pinterest.com/pin/720927852878035732/)
 - [tranz sockz](https://pinterest.com/pin/1097330265448878569/)
-- [kaworu (this guy is at least gay)](https://pinterest.com/pin/234820568065761247/)
+- [kaworu](https://pinterest.com/pin/234820568065761247/)
 - [Girl inside](https://pinterest.com/pin/1144266217794275651/)
 - [Sylveooonn >www<](https://pinterest.com/pin/588564245054592208/)
 - [Estrogen](https://pinterest.com/pin/341569952989980452/)
@@ -41,3 +41,4 @@ Not necessarelly sorted <3
 - [Guestbook](./guestbook.html)
 - [Devlog](#devlog)
 - [Stickers](./stickers/)
+- [groups.io/g/MTFHRT/wiki/29602](https://groups.io/g/MTFHRT/wiki/29602)

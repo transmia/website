@@ -8,7 +8,7 @@ Hiiii im *Mia* and this is my cute little website :33
 
 ## Why did you choose Mia??
 
-idk i like it it may change in the future ;w;
+idk i like it
 
 ## Who are you really?
 
@@ -29,9 +29,11 @@ yea and also i shoot people with a 9mm
 ## music?
 
 omaga takanaka i love you
-and ANRI ofcourse and momoko kikuchi and bunch of more  
+and ANRI ofcourse and bunch of more  
 [*olympic*](https://en.wikipedia.org/wiki/Olympic_(band))
+and stuff like [Klaus Schulze](https://en.wikipedia.org/wiki/Klaus_Schulze) - [*Timewind*](https://www.youtube.com/watch?v=qBn0Jnf7_3M)  
 
-##
+## 
 
-cat
+cats :3
+
