@@ -20,6 +20,12 @@
     </div>
     <div id="sparkles"></div>
 
+    <div id="gb-ctx-menu">
+        <div class="gb-ctx-item" id="gb-ctx-merge">request merge</div>
+        <hr class="gb-ctx-sep">
+        <div class="gb-ctx-item" id="gb-ctx-close">close menu</div>
+    </div>
+
     <div id="layout">
 
         <div id="banner">
@@ -65,6 +71,8 @@
 
         let userId = null;
         let mySlot = null;
+        let myOwners = [];
+
         let tool = "pen";
         let drawing = false;
         let lastX = null, lastY = null;
@@ -73,6 +81,8 @@
 
         let undoStack = [];
         let redoStack = [];
+
+        let registered = false;
 
         let panning = false;
         let panStartX = 0, panStartY = 0;
@@ -86,7 +96,10 @@
         const ZOOM_MAX = 8;
         const ZOOM_STEP = 0.12;
 
-        const tileByUid = new Map();
+        const tileBySlot = new Map();
+        const slotHasPending = new Map();
+
+        const ALLOW_SELF_MERGE = true;
 
         const world = document.getElementById("gb-world");
         const canvasArea = document.getElementById("gb-canvas-area");
@@ -94,6 +107,11 @@
         const hint = document.getElementById("gb-viewport-hint");
         const colorPick = document.getElementById("gb-color");
         const sizeSlider = document.getElementById("gb-pen-size");
+        const ctxMenu = document.getElementById("gb-ctx-menu");
+        const ctxMerge = document.getElementById("gb-ctx-merge");
+        const ctxClose = document.getElementById("gb-ctx-close");
+
+        let ctxTargetSlot = null;
 
         function updateSliderFill() {
             const pct = ((+sizeSlider.value - +sizeSlider.min) / (+sizeSlider.max - +sizeSlider.min) * 100).toFixed(1) + "%";
@@ -106,7 +124,6 @@
             requestIdleCallback(async () => {
                 const wait = (min, max) =>
                     new Promise(r => setTimeout(r, Math.random() * (max - min) + min));
-
                 await wait(100, 600);
                 console.log("[server] hmm bobby");
                 await wait(100, 600);
@@ -196,18 +213,27 @@
             return "rawrgba:" + uint8ToBase64(compressed);
         }
 
-        function createTileCanvas(slot, imageData, uid) {
+        function isValidImage(src) {
+            return typeof src === "string" && (
+                src.startsWith("rawrgba:") ||
+                src.startsWith("data:") ||
+                src.startsWith("http")
+            );
+        }
+
+        function createTileCanvas(slot, imageData) {
             const { x, y } = slotToXY(slot);
             const c = document.createElement("canvas");
             c.width = TILE_W; c.height = TILE_H;
             c.className = "gb-tile";
             c.style.left = x + "px";
             c.style.top = y + "px";
+            c.dataset.slot = slot;
             const ctx = c.getContext("2d");
             if (imageData) { ctx.putImageData(imageData, 0, 0); }
             else { ctx.fillStyle = DEFAULT_BG; ctx.fillRect(0, 0, TILE_W, TILE_H); }
             world.appendChild(c);
-            if (uid) { c.dataset.uid = uid; tileByUid.set(uid, c); }
+            tileBySlot.set(slot, c);
             return c;
         }
 
@@ -221,8 +247,10 @@
             myCanvas.classList.add("gb-tile", "gb-tile-mine");
             myCanvas.style.left = x + "px";
             myCanvas.style.top = y + "px";
+            myCanvas.dataset.slot = slot;
             world.appendChild(myCanvas);
             myCtx = myCanvas.getContext("2d", { willReadFrequently: true });
+            tileBySlot.set(slot, myCanvas);
         }
 
         function loadMyImage(imageData) {
@@ -284,6 +312,14 @@
             return wx >= x && wx < x + TILE_W && wy >= y && wy < y + TILE_H;
         }
 
+        function slotAtWorldPos(wx, wy) {
+            for (const [slot] of tileBySlot) {
+                const { x, y } = slotToXY(slot);
+                if (wx >= x && wx < x + TILE_W && wy >= y && wy < y + TILE_H) return slot;
+            }
+            return null;
+        }
+
         function drawAt(wx, wy, fromX, fromY) {
             if (!myCanvas) return;
             const { x: ox, y: oy } = slotToXY(mySlot);
@@ -310,15 +346,11 @@
         function applyZoom(newZoom, pivotClientX, pivotClientY) {
             newZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, newZoom));
             if (newZoom === zoom) return;
-
             const rect = canvasArea.getBoundingClientRect();
             const wx = (pivotClientX - rect.left + canvasArea.scrollLeft) / zoom;
             const wy = (pivotClientY - rect.top + canvasArea.scrollTop) / zoom;
-
             zoom = newZoom;
-            world.style.transformOrigin = "0 0";
             world.style.transform = `scale(${zoom})`;
-
             canvasArea.scrollLeft = wx * zoom - (pivotClientX - rect.left);
             canvasArea.scrollTop = wy * zoom - (pivotClientY - rect.top);
         }
@@ -358,24 +390,23 @@
         let pendingWx = 0, pendingWy = 0;
 
         canvasArea.addEventListener("mousedown", e => {
+            if (e.button === 2) return;
             e.preventDefault();
+            hideCtxMenu();
             cancelAnimationFrame(panRafId);
             panVelX = 0; panVelY = 0;
             const { wx, wy } = worldPosFromEvent(e);
             if (inMyTile(wx, wy)) {
-                tool = e.button === 2 ? "eraser" : "pen";
+                tool = "pen";
                 snapshotForUndo();
                 drawing = true;
                 drawAt(wx, wy, null, null);
                 lastX = wx; lastY = wy;
             } else {
                 panning = true;
-                panStartX = e.clientX;
-                panStartY = e.clientY;
-                panScrollX = canvasArea.scrollLeft;
-                panScrollY = canvasArea.scrollTop;
-                panLastX = e.clientX;
-                panLastY = e.clientY;
+                panStartX = e.clientX; panStartY = e.clientY;
+                panScrollX = canvasArea.scrollLeft; panScrollY = canvasArea.scrollTop;
+                panLastX = e.clientX; panLastY = e.clientY;
             }
         });
 
@@ -394,33 +425,107 @@
             } else if (panning) {
                 panVelX = -(e.clientX - panLastX);
                 panVelY = -(e.clientY - panLastY);
-                panLastX = e.clientX;
-                panLastY = e.clientY;
+                panLastX = e.clientX; panLastY = e.clientY;
                 canvasArea.scrollLeft = panScrollX - (e.clientX - panStartX);
                 canvasArea.scrollTop = panScrollY - (e.clientY - panStartY);
             }
         });
 
         function stopDraw() { drawing = false; lastX = null; lastY = null; }
-        function stopPan() {
-            if (panning) { panning = false; startMomentum(); }
-        }
+        function stopPan() { if (panning) { panning = false; startMomentum(); } }
 
         canvasArea.addEventListener("mouseup", () => { stopDraw(); stopPan(); });
         canvasArea.addEventListener("mouseleave", () => { stopDraw(); stopPan(); });
-        canvasArea.addEventListener("contextmenu", e => e.preventDefault());
+
+        function hideCtxMenu() {
+            ctxMenu.classList.remove("show");
+            ctxTargetSlot = null;
+        }
+
+        function showCtxMenu(clientX, clientY, slot) {
+            if (slot === mySlot && !ALLOW_SELF_MERGE) { hideCtxMenu(); return; }
+
+            ctxTargetSlot = slot;
+
+            const isSelf = slot === mySlot;
+            const hasPending = !isSelf && slotHasPending.get(slot) === true;
+            if (isSelf) {
+                ctxMerge.textContent = "test self-merge (dev)";
+                ctxMerge.classList.remove("disabled");
+            } else if (hasPending) {
+                ctxMerge.textContent = "merge request pending";
+                ctxMerge.classList.add("disabled");
+            } else {
+                ctxMerge.textContent = "request merge";
+                ctxMerge.classList.remove("disabled");
+            }
+
+            const menuW = 160, menuH = 80;
+            let left = clientX + 4;
+            let top = clientY + 4;
+            if (left + menuW > window.innerWidth) left = clientX - menuW - 4;
+            if (top + menuH > window.innerHeight) top = clientY - menuH - 4;
+            ctxMenu.style.left = left + "px";
+            ctxMenu.style.top = top + "px";
+            ctxMenu.classList.add("show");
+        }
+
+        canvasArea.addEventListener("contextmenu", e => {
+            e.preventDefault();
+            const { wx, wy } = worldPosFromEvent(e);
+            const slot = slotAtWorldPos(wx, wy);
+            if (slot === null) { hideCtxMenu(); return; }
+            if (slot === mySlot && !ALLOW_SELF_MERGE) { hideCtxMenu(); return; }
+            showCtxMenu(e.clientX, e.clientY, slot);
+        });
+
+        let longPressTimer = null;
+        let longPressPos = null;
+
+        canvasArea.addEventListener("touchstart", e => {
+            if (e.touches.length !== 1) return;
+            const touch = e.touches[0];
+            longPressPos = { x: touch.clientX, y: touch.clientY };
+            longPressTimer = setTimeout(() => {
+                const rect = canvasArea.getBoundingClientRect();
+                const wx = (longPressPos.x - rect.left + canvasArea.scrollLeft) / zoom;
+                const wy = (longPressPos.y - rect.top + canvasArea.scrollTop) / zoom;
+                const slot = slotAtWorldPos(wx, wy);
+                if (slot === null) return;
+                if (slot === mySlot && !ALLOW_SELF_MERGE) return;
+                showCtxMenu(longPressPos.x, longPressPos.y, slot);
+            }, 500);
+        }, { passive: true });
+
+        canvasArea.addEventListener("touchmove", () => {
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        }, { passive: true });
+
+        canvasArea.addEventListener("touchend", () => {
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        });
+
+        document.addEventListener("mousedown", e => {
+            if (!ctxMenu.contains(e.target)) hideCtxMenu();
+        });
+
+        ctxClose.addEventListener("click", hideCtxMenu);
+
+        ctxMerge.addEventListener("click", () => {
+            if (ctxMerge.classList.contains("disabled")) return;
+            const slot = ctxTargetSlot;
+            hideCtxMenu();
+            if (slot === null) return;
+            if (!registered && slot !== mySlot) {
+                status.textContent = "draw something first! :3";
+                return;
+            }
+            showMergeRequestConfirm(slot);
+        });
 
         function scheduleSave() {
             clearTimeout(saveTimer);
             saveTimer = setTimeout(saveMyTile, 1500);
-        }
-
-        function isValidImage(src) {
-            return typeof src === "string" && (
-                src.startsWith("rawrgba:") ||
-                src.startsWith("data:") ||
-                src.startsWith("http")
-            );
         }
 
         async function saveMyTile() {
@@ -429,12 +534,13 @@
             status.textContent = "saving...";
             try {
                 const { error } = await supabase.from("tiles").upsert({
-                    user_id: userId,
-                    image: await canvasToLosslessDataURL(myCanvas),
                     slot: mySlot,
+                    image: await canvasToLosslessDataURL(myCanvas),
+                    owners: myOwners,
                 });
                 if (error) throw error;
-                status.textContent = "saved >_<";
+                registered = true;
+                status.textContent = "saved &gt_&lt";
             } catch (err) {
                 console.error(err);
                 dirty = true;
@@ -453,6 +559,254 @@
             setTimeout(() => hint.classList.remove("show"), 3000);
         }
 
+        function makeOverlay() {
+            const ov = document.createElement("div");
+            ov.className = "gb-overlay";
+            document.body.appendChild(ov);
+            return ov;
+        }
+
+        function removeOverlay(ov) {
+            if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+        }
+
+        function showMergeRequestConfirm(targetSlot) {
+            if (targetSlot === mySlot && ALLOW_SELF_MERGE) {
+                const fakeReq = { id: "dev-self", from_slot: mySlot, to_slot: mySlot };
+                showIncomingMergeRequest(fakeReq);
+                return;
+            }
+
+            const ov = makeOverlay();
+            ov.innerHTML = `
+                <div class="gb-popup">
+                    <h2>request merge?</h2>
+                    <p>you're about to send a merge request to tile #${targetSlot}.</p>
+                    <p>if they accept, your slot will be freed up for future visitors. you'll both be co-owners of their tile and can draw on it together.</p>
+                    <p>the other person chooses what happens to the drawing.</p>
+                    <div class="gb-btn-row">
+                        <button class="gb-btn" id="gb-mreq-no">cancel</button>
+                        <button class="gb-btn primary" id="gb-mreq-yes">send request</button>
+                    </div>
+                </div>`;
+            ov.querySelector("#gb-mreq-no").addEventListener("click", () => removeOverlay(ov));
+            ov.querySelector("#gb-mreq-yes").addEventListener("click", async () => {
+                removeOverlay(ov);
+                await sendMergeRequest(targetSlot);
+            });
+        }
+
+        async function sendMergeRequest(targetSlot) {
+            status.textContent = "sending...";
+            try {
+                const { error } = await supabase.from("merge_requests").insert({
+                    from_slot: mySlot,
+                    to_slot: targetSlot,
+                    status: "pending",
+                });
+                if (error) throw error;
+                slotHasPending.set(targetSlot, true);
+                status.textContent = "request sent ^w^";
+            } catch (err) {
+                console.error(err);
+                status.textContent = "already a pending request :(";
+            }
+        }
+
+        function showIncomingMergeRequest(req) {
+            const ov = makeOverlay();
+            ov.innerHTML = `
+                <div class="gb-popup">
+                    <h2>merge request!</h2>
+                    <p>tile #${req.from_slot} wants to merge into yours.</p>
+                    <p>if you accept, their slot will be freed up for future visitors. youll both be co-owners of your tile and can draw on it together.</p>
+                    <div class="gb-btn-row">
+                        <button class="gb-btn" id="gb-inc-no">decline</button>
+                        <button class="gb-btn primary" id="gb-inc-yes">accept</button>
+                    </div>
+                </div>`;
+            ov.querySelector("#gb-inc-no").addEventListener("click", async () => {
+                removeOverlay(ov);
+                if (req.id !== "dev-self") {
+                    await supabase.from("merge_requests").update({ status: "rejected" }).eq("id", req.id);
+                    slotHasPending.delete(req.to_slot);
+                }
+            });
+            ov.querySelector("#gb-inc-yes").addEventListener("click", () => {
+                removeOverlay(ov);
+                showMergeTypeSelect(req);
+            });
+        }
+
+        function showMergeTypeSelect(req) {
+            const ov = makeOverlay();
+            ov.innerHTML = `
+                <div class="gb-popup">
+                    <h2>how should the drawing look?</h2>
+                    <p>"mine" is your current drawing. "theirs" is the drawing from tile #${req.from_slot}.</p>
+                    <div class="gb-merge-opts">
+                        <label class="gb-merge-opt">
+                            <input type="radio" name="gb-merge-mode" value="keep-mine" checked>
+                            <label><strong>keep mine</strong><span>your drawing stays, theirs is discarded.</span></label>
+                        </label>
+                        <label class="gb-merge-opt">
+                            <input type="radio" name="gb-merge-mode" value="keep-theirs">
+                            <label><strong>keep theirs</strong><span>their drawing replaces yours.</span></label>
+                        </label>
+                        <label class="gb-merge-opt">
+                            <input type="radio" name="gb-merge-mode" value="clear">
+                            <label><strong>clear</strong><span>both drawings are cleared. (empty tile)</span></label>
+                        </label>
+                        <label class="gb-merge-opt">
+                            <input type="radio" name="gb-merge-mode" value="mine-on-top">
+                            <label><strong>merge - mine on top</strong><span>both blended, your drawing on top.</span></label>
+                        </label>
+                        <label class="gb-merge-opt">
+                            <input type="radio" name="gb-merge-mode" value="theirs-on-top">
+                            <label><strong>merge - theirs on top</strong><span>both blended, their drawing on top.</span></label>
+                        </label>
+                    </div>
+                    <div class="gb-btn-row">
+                        <button class="gb-btn" id="gb-mt-back">go back</button>
+                        <button class="gb-btn primary" id="gb-mt-next">continue</button>
+                    </div>
+                </div>`;
+            ov.querySelector("#gb-mt-back").addEventListener("click", () => {
+                removeOverlay(ov);
+                showIncomingMergeRequest(req);
+            });
+            ov.querySelector("#gb-mt-next").addEventListener("click", () => {
+                const mode = ov.querySelector("input[name=gb-merge-mode]:checked").value;
+                removeOverlay(ov);
+                showMergeFinalConfirm(req, mode);
+            });
+        }
+
+        function showMergeFinalConfirm(req, mode) {
+            const modeLabels = {
+                "keep-mine":     "keep your drawing",
+                "keep-theirs":   "replace with their drawing",
+                "clear":         "clear both drawings",
+                "mine-on-top":   "blend both (yours on top)",
+                "theirs-on-top": "blend both (theirs on top)",
+            };
+            const ov = makeOverlay();
+            ov.innerHTML = `
+                <div class="gb-popup">
+                    <h2>are you sure?</h2>
+                    <p>you're about to merge tile #${req.from_slot} into yours.</p>
+                    <p>drawing: <strong>${modeLabels[mode]}</strong></p>
+                    <p class="gb-warn">THIS CANNOT BE UNDONE!!</p>
+                    <div class="gb-btn-row">
+                        <button class="gb-btn" id="gb-mf-back">go back</button>
+                        <button class="gb-btn danger" id="gb-mf-confirm">yes, merge</button>
+                    </div>
+                </div>`;
+            ov.querySelector("#gb-mf-back").addEventListener("click", () => {
+                removeOverlay(ov);
+                showMergeTypeSelect(req);
+            });
+            ov.querySelector("#gb-mf-confirm").addEventListener("click", async () => {
+                removeOverlay(ov);
+                await executeMerge(req, mode);
+            });
+        }
+
+        async function executeMerge(req, mode) {
+            if (req.id === "dev-self") {
+                status.textContent = "dev self-merge complete (no-op)";
+                return;
+            }
+            status.textContent = "merging...";
+            try {
+                const { data: theirRow, error: fetchErr } = await supabase
+                    .from("tiles")
+                    .select("image, owners")
+                    .eq("slot", req.from_slot)
+                    .maybeSingle();
+                if (fetchErr) throw fetchErr;
+
+                let newImageData = null;
+
+                if (mode === "keep-mine") {
+                    newImageData = myCtx.getImageData(0, 0, TILE_W, TILE_H);
+                } else if (mode === "clear") {
+                    newImageData = null;
+                } else {
+                    let theirData = null;
+                    if (isValidImage(theirRow?.image)) {
+                        theirData = await imgSrcToImageData(theirRow.image).catch(() => null);
+                    }
+                    if (mode === "keep-theirs") {
+                        newImageData = theirData;
+                    } else if (mode === "mine-on-top") {
+                        newImageData = blendImages(theirData, myCtx.getImageData(0, 0, TILE_W, TILE_H));
+                    } else if (mode === "theirs-on-top") {
+                        newImageData = blendImages(myCtx.getImageData(0, 0, TILE_W, TILE_H), theirData);
+                    }
+                }
+
+                snapshotForUndo();
+                if (newImageData) {
+                    myCtx.putImageData(newImageData, 0, 0);
+                } else {
+                    myCtx.fillStyle = DEFAULT_BG;
+                    myCtx.fillRect(0, 0, TILE_W, TILE_H);
+                }
+
+                const theirOwners = Array.isArray(theirRow?.owners) ? theirRow.owners : [];
+                const newOwners = [...new Set([...myOwners, ...theirOwners])];
+                myOwners = newOwners;
+
+                const newImageSrc = await canvasToLosslessDataURL(myCanvas);
+                const { error: saveErr } = await supabase.from("tiles").upsert({
+                    slot: mySlot,
+                    image: newImageSrc,
+                    owners: myOwners,
+                });
+                if (saveErr) throw saveErr;
+
+                const { error: absorbErr } = await supabase.from("tiles").upsert({
+                    slot: req.from_slot,
+                    image: '',
+                    owners: [],
+                });
+                if (absorbErr) throw absorbErr;
+
+                await supabase.from("merge_requests").update({ status: "accepted" }).eq("id", req.id);
+
+                const theirCanvas = tileBySlot.get(req.from_slot);
+                if (theirCanvas) {
+                    const tc = theirCanvas.getContext("2d");
+                    tc.fillStyle = DEFAULT_BG;
+                    tc.fillRect(0, 0, TILE_W, TILE_H);
+                }
+
+                slotHasPending.delete(req.to_slot);
+                dirty = false;
+                status.textContent = "merged! ^w^";
+            } catch (err) {
+                console.error(err);
+                status.textContent = "merge failed :(";
+            }
+        }
+
+        function blendImages(bottom, top) {
+            const tmp = document.createElement("canvas");
+            tmp.width = TILE_W; tmp.height = TILE_H;
+            const ctx = tmp.getContext("2d");
+            ctx.fillStyle = DEFAULT_BG;
+            ctx.fillRect(0, 0, TILE_W, TILE_H);
+            if (bottom) ctx.putImageData(bottom, 0, 0);
+            if (top) {
+                const tmp2 = document.createElement("canvas");
+                tmp2.width = TILE_W; tmp2.height = TILE_H;
+                tmp2.getContext("2d").putImageData(top, 0, 0);
+                ctx.drawImage(tmp2, 0, 0);
+            }
+            return ctx.getImageData(0, 0, TILE_W, TILE_H);
+        }
+
         async function init() {
             status.textContent = "connectiting...";
 
@@ -465,52 +819,136 @@
 
             const { data: rows, error } = await supabase
                 .from("tiles")
-                .select("user_id, image, slot")
-                .order("slot", { ascending: true });
+                .select("slot, owners")
+                .order("slot")
+                .limit(10000);
 
             if (error) { status.textContent = "error :("; console.error(error); return; }
 
-            const myRow = rows.find(r => r.user_id === userId);
-            const maxSlot = rows.reduce((m, r) => Math.max(m, r.slot ?? -1), -1);
-            mySlot = (myRow && myRow.slot !== null) ? myRow.slot : maxSlot + 1;
+            const myRow = rows.find(r => Array.isArray(r.owners) && r.owners.includes(userId));
+
+            let mySlot_new;
+            if (myRow) {
+                mySlot_new = myRow.slot;
+            } else {
+                const takenSlots = new Set(rows.filter(r => Array.isArray(r.owners) && r.owners.length > 0).map(r => r.slot));
+                let candidate = 0;
+                while (takenSlots.has(candidate)) candidate++;
+                mySlot_new = candidate;
+            }
+            mySlot = mySlot_new;
+            myOwners = myRow?.owners ?? [userId];
+
+            const { data: pendingReqs } = await supabase
+                .from("merge_requests")
+                .select("id, from_slot, to_slot, status")
+                .eq("status", "pending");
+
+            if (pendingReqs) {
+                for (const r of pendingReqs) slotHasPending.set(r.to_slot, true);
+
+                const incoming = pendingReqs.find(r => r.to_slot === mySlot && r.from_slot !== mySlot);
+                if (incoming) setTimeout(() => showIncomingMergeRequest(incoming), 1200);
+            }
 
             for (const row of rows) {
-                if (row.user_id === userId || row.slot === null) continue;
-                const finish = id => { createTileCanvas(row.slot, id, row.user_id); };
-                if (isValidImage(row.image)) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
-                else { finish(null); }
+                if (row.slot === mySlot) continue;
+                createTileCanvas(row.slot, null);
             }
+
+            async function loadTileImages(slots) {
+                for (const slot of slots) {
+                    const { data: imgRow } = await supabase
+                        .from("tiles")
+                        .select("image")
+                        .eq("slot", slot)
+                        .maybeSingle();
+                    if (imgRow && isValidImage(imgRow.image)) {
+                        imgSrcToImageData(imgRow.image)
+                            .then(id => {
+                                const c = tileBySlot.get(slot);
+                                if (c) c.getContext("2d").putImageData(id, 0, 0);
+                            })
+                            .catch(() => {});
+                    }
+                }
+            }
+            loadTileImages(rows.filter(r => r.slot !== mySlot).map(r => r.slot));
 
             createMyCanvas(mySlot);
 
-            if (myRow && myRow.image) {
-                imgSrcToImageData(myRow.image).then(id => {
-                    loadMyImage(id);
-                    if (!myRow.image.startsWith("rawrgba:")) {
-                        dirty = true;
-                        scheduleSave();
-                    }
-                }).catch(() => loadMyImage(null));
+            if (myRow) {
+                registered = true;
+                const { data: myImgRow } = await supabase
+                    .from("tiles")
+                    .select("image")
+                    .eq("slot", mySlot)
+                    .maybeSingle();
+                const myImage = myImgRow?.image ?? null;
+                if (myImage) {
+                    imgSrcToImageData(myImage).then(id => {
+                        loadMyImage(id);
+                        if (!myImage.startsWith("rawrgba:")) {
+                            dirty = true; scheduleSave();
+                        }
+                    }).catch(() => loadMyImage(null));
+                } else {
+                    loadMyImage(null);
+                }
             } else {
                 loadMyImage(null);
             }
 
             status.textContent = "readyy";
             flashHint();
-
             requestAnimationFrame(scrollToMyTile);
 
             supabase.channel("tiles-channel")
                 .on("postgres_changes", { event: "*", schema: "public", table: "tiles" }, payload => {
                     const row = payload.new;
-                    if (!row || row.user_id === userId || row.slot === null) return;
+                    if (!row || row.slot === mySlot) return;
 
-                    const existing = tileByUid.get(row.user_id);
-                    if (existing) { existing.remove(); tileByUid.delete(row.user_id); }
+                    const existing = tileBySlot.get(row.slot);
+                    if (existing) { existing.remove(); tileBySlot.delete(row.slot); }
 
-                    const finish = id => { createTileCanvas(row.slot, id, row.user_id); };
-                    if (isValidImage(row.image)) { imgSrcToImageData(row.image).then(finish).catch(() => finish(null)); }
-                    else { finish(null); }
+                    const finish = id => createTileCanvas(row.slot, id);
+                    if (isValidImage(row.image)) {
+                        imgSrcToImageData(row.image).then(finish).catch(() => finish(null));
+                    } else {
+                        finish(null);
+                    }
+                })
+                .subscribe();
+
+            supabase.channel("merge-requests-channel")
+                .on("postgres_changes", {
+                    event: "INSERT",
+                    schema: "public",
+                    table: "merge_requests",
+                }, payload => {
+                    const req = payload.new;
+                    if (!req) return;
+                    if (req.to_slot === mySlot && req.from_slot !== mySlot) {
+                        slotHasPending.set(req.to_slot, true);
+                        showIncomingMergeRequest(req);
+                    }
+                })
+                .on("postgres_changes", {
+                    event: "UPDATE",
+                    schema: "public",
+                    table: "merge_requests",
+                }, payload => {
+                    const req = payload.new;
+                    if (!req) return;
+                    if (req.from_slot === mySlot) {
+                        if (req.status === "accepted") {
+                            status.textContent = "merge accepted! reloading...";
+                            setTimeout(() => location.reload(), 1500);
+                        } else if (req.status === "rejected") {
+                            slotHasPending.delete(req.to_slot);
+                            status.textContent = "merge declined :(";
+                        }
+                    }
                 })
                 .subscribe();
         }
