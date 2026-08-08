@@ -328,8 +328,13 @@
             myCtx.lineWidth = parseInt(sizeSlider.value, 10);
             myCtx.lineCap = "round";
             myCtx.lineJoin = "round";
-            myCtx.strokeStyle = (tool === "eraser") ? DEFAULT_BG : colorPick.value;
-            myCtx.globalCompositeOperation = "source-over";
+            if (tool === "eraser") {
+                myCtx.globalCompositeOperation = "destination-out";
+                myCtx.strokeStyle = "rgba(0,0,0,1)";
+            } else {
+                myCtx.globalCompositeOperation = "source-over";
+                myCtx.strokeStyle = colorPick.value;
+            }
             myCtx.beginPath();
             if (fromX !== null && fromY !== null) {
                 myCtx.moveTo(fromX - ox, fromY - oy);
@@ -389,8 +394,35 @@
         let drawPending = false;
         let pendingWx = 0, pendingWy = 0;
 
+        // right-button: drag = erase, hold still = context menu
+        const CTX_HOLD_MS = 400;
+        const CTX_EPSILON = 6;
+        let rightErasing = false;
+        let rightHoldTimer = null;
+        let rightHoldStart = null;
+
         canvasArea.addEventListener("mousedown", e => {
-            if (e.button === 2) return;
+            if (e.button === 2) {
+                e.preventDefault();
+                hideCtxMenu();
+                const { wx, wy } = worldPosFromEvent(e);
+                rightHoldStart = { clientX: e.clientX, clientY: e.clientY, wx, wy };
+                if (inMyTile(wx, wy)) {
+                    rightErasing = true;
+                    tool = "eraser";
+                    snapshotForUndo();
+                    drawAt(wx, wy, null, null);
+                    lastX = wx; lastY = wy;
+                }
+                rightHoldTimer = setTimeout(() => {
+                    rightHoldTimer = null;
+                    const slot = slotAtWorldPos(rightHoldStart.wx, rightHoldStart.wy);
+                    if (slot === null) return;
+                    if (slot === mySlot && !ALLOW_SELF_MERGE) return;
+                    showCtxMenu(rightHoldStart.clientX, rightHoldStart.clientY, slot);
+                }, CTX_HOLD_MS);
+                return;
+            }
             e.preventDefault();
             hideCtxMenu();
             cancelAnimationFrame(panRafId);
@@ -411,6 +443,23 @@
         });
 
         canvasArea.addEventListener("mousemove", e => {
+            if (rightErasing) {
+                const { wx, wy } = worldPosFromEvent(e);
+                pendingWx = wx; pendingWy = wy;
+                if (!drawPending) {
+                    drawPending = true;
+                    requestAnimationFrame(() => {
+                        drawAt(pendingWx, pendingWy, lastX, lastY);
+                        lastX = pendingWx; lastY = pendingWy;
+                        drawPending = false;
+                    });
+                }
+                if (rightHoldTimer) {
+                    clearTimeout(rightHoldTimer);
+                    rightHoldTimer = null;
+                }
+                return;
+            }
             if (drawing) {
                 const { wx, wy } = worldPosFromEvent(e);
                 pendingWx = wx; pendingWy = wy;
@@ -433,9 +482,17 @@
 
         function stopDraw() { drawing = false; lastX = null; lastY = null; }
         function stopPan() { if (panning) { panning = false; startMomentum(); } }
+        function stopErase() {
+            if (rightErasing) { rightErasing = false; tool = "pen"; lastX = null; lastY = null; }
+            if (rightHoldTimer) { clearTimeout(rightHoldTimer); rightHoldTimer = null; }
+            rightHoldStart = null;
+        }
 
-        canvasArea.addEventListener("mouseup", () => { stopDraw(); stopPan(); });
-        canvasArea.addEventListener("mouseleave", () => { stopDraw(); stopPan(); });
+        canvasArea.addEventListener("mouseup", e => {
+            if (e.button === 2) { stopErase(); return; }
+            stopDraw(); stopPan();
+        });
+        canvasArea.addEventListener("mouseleave", () => { stopDraw(); stopPan(); stopErase(); });
 
         function hideCtxMenu() {
             ctxMenu.classList.remove("show");
@@ -470,14 +527,7 @@
             ctxMenu.classList.add("show");
         }
 
-        canvasArea.addEventListener("contextmenu", e => {
-            e.preventDefault();
-            const { wx, wy } = worldPosFromEvent(e);
-            const slot = slotAtWorldPos(wx, wy);
-            if (slot === null) { hideCtxMenu(); return; }
-            if (slot === mySlot && !ALLOW_SELF_MERGE) { hideCtxMenu(); return; }
-            showCtxMenu(e.clientX, e.clientY, slot);
-        });
+        canvasArea.addEventListener("contextmenu", e => e.preventDefault());
 
         let longPressTimer = null;
         let longPressPos = null;
@@ -540,7 +590,7 @@
                 });
                 if (error) throw error;
                 registered = true;
-                status.textContent = "saved &gt_&lt";
+                status.textContent = "saved >_\x3C"; // for emacs hl to not freak out
             } catch (err) {
                 console.error(err);
                 dirty = true;
@@ -766,14 +816,17 @@
                 });
                 if (saveErr) throw saveErr;
 
-                const { error: absorbErr } = await supabase.from("tiles").upsert({
-                    slot: req.from_slot,
-                    image: '',
-                    owners: [],
-                });
-                if (absorbErr) throw absorbErr;
+                const { error: acceptErr } = await supabase
+                    .from("merge_requests")
+                    .update({ status: "accepted" })
+                    .eq("id", req.id);
+                if (acceptErr) throw acceptErr;
 
-                await supabase.from("merge_requests").update({ status: "accepted" }).eq("id", req.id);
+                const { error: absorbErr } = await supabase
+                    .from("tiles")
+                    .delete()
+                    .eq("slot", req.from_slot);
+                if (absorbErr) throw absorbErr;
 
                 const theirCanvas = tileBySlot.get(req.from_slot);
                 if (theirCanvas) {
@@ -957,5 +1010,4 @@
     </script>
     <script src="cursor.js"></script>
 </body>
-
 </html>

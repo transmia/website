@@ -325,6 +325,7 @@ li::before {
   image-rendering: pixelated;
   border: 1px solid rgba(212, 160, 170, 0.4);
   box-sizing: border-box;
+  background-color: #fff5f7;
 }
 
 .gb-tile-mine {
