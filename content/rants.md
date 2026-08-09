@@ -1,5 +1,12 @@
 # RANTSS (or blog)
 
+## laugne - 9.8.2026
+
+haii today i was doing a bunch of nothing and then i went on a bike to *Valašské Medziříčí*
+(because im in czechia rn) with my grandma and i had PIZZA :33  
+(*laugne* is a cool building thingy that i like and i was talking with my grandma
+about it also i think its called *arcade walkway* in english)  
+
 ## im back!! - 7.8.2026
 
 heloooo im baack im so sorry i wasnt posting  
@@ -37,7 +44,7 @@ like no please fucking he needs to realize he just cant keep doing this
 when i told him he just called me bunch of slurs and said were "done"  
 and he was texting the lyrics of roses by outkast meanwhile calling me slurs  
 i hate myself so fucking much my whole arm is cut  
-atleast my skin regenerates really good and i dont have any skars from it  
+atleast my skin regenerates really good and i dont have any scars from it  
 
 ## rick astley - 6.7.2026
 
