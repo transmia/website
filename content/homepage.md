@@ -26,6 +26,10 @@ Im a programmerr i mainly use Rust the femboy lang and C, also im a student so n
 yea and also i shoot people with a 9mm
 <span class="spoiler">lens what did you thought (NIKON MY BELOVED)</span>
 
+## What editor do u use??
+
+EMACS (i use arch btw)  
+
 ## music?
 
 omaga takanaka i love you

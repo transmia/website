@@ -1,5 +1,16 @@
 # RANTSS (or blog)
 
+## peniscillin - 19.8.2026
+
+hiiiiii em IM SO SORRYYY i just didnt know what to post :/  
+yea so since i forgor everything that happened in between im just going to say about today  
+soooo.. i had my first cigarete today and em i was outside with a VERY COOL AND FUNNY GIRL  
+she finally like matches my autistic ahh  
+and eemmmm idk we went to buy a dress for my other friend and while she was trying them on
+i found a cute hello kitty notepad for just **4.45€** soo ill be buying that  
+(she said *peniscillin* is the word of the day)  
+oki byee!!
+
 ## laugne - 9.8.2026
 
 haii today i was doing a bunch of nothing and then i went on a bike to *Valašské Medziříčí*
