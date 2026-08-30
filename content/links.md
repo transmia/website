@@ -41,4 +41,5 @@ Not necessarelly sorted <3
 - [Guestbook](./guestbook.html)
 - [Devlog](#devlog)
 - [Stickers](./stickers/)
-- [groups.io/g/MTFHRT/wiki/29602](https://groups.io/g/MTFHRT/wiki/29602)
+- [valerie.vg](https://valerie.vg)
+- [My instagram <3](https://instagram.com/vpunpckldq)

@@ -1,5 +1,15 @@
 # RANTSS (or blog)
 
+## pooke - 30.8.2026
+
+heloooooo girlsss  
+i had the most delicious frontevious perfected tastiest poke bowl ever  
+at a "random" [vietnam restaurant](https://welovepho.org/) in our city  
+it was with tempera shrimp (idk what that means)  
+it was soooo good and only 10.90€  
+but anyway before that i was with my pookies and we made like 14 bracelets (when summed)  
+fucking mosquito its annoying me rn
+
 ## peniscillin - 19.8.2026
 
 hiiiiii em IM SO SORRYYY i just didnt know what to post :/  
