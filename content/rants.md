@@ -1,5 +1,11 @@
 # RANTSS (or blog)
 
+## last day of summer - 31.8.2026
+
+em it is yes we have to go to school tomorrow :(  
+and im fucking looking at pink shock collars on amazon
+what am i doing genuenly  
+
 ## pooke - 30.8.2026
 
 heloooooo girlsss  
