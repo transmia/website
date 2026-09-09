@@ -1,5 +1,18 @@
 # RANTSS (or blog)
 
+## cedarwood state - 9.9.2026
+
+school is killing me we have like billion classes every day and we have 0th hour 3/5 days  
+but anyway  
+i found a REALLY PRETTY shirt from cedarwood state in my size on vinted from a polish seller with 4.6 rating so i though ez 
+ill order it will came and ill be happy BULLSHIT the seller didnt do anything they just ignored me  
+its so sad i was really excited for it because the shirt was like black with white stripes but not the standard ones just like
+subtle and had the stuff on the arms ikydk but just know it looked really cool and it looked legit. im just so sad 
+i had like 3 outfits planned with it already and it was like yk adrogenous so i couldve worn it to school normally and then just like 
+switch the belt and go with friends.
+why i just dont understand and it was cheap too i was like i would be a fool if i didnt take this deal.
+im so sad :(
+
 ## last day of summer - 31.8.2026
 
 em it is yes we have to go to school tomorrow :(  
