@@ -1,5 +1,21 @@
 # RANTSS (or blog)
 
+## october canon event - 16.10.2026
+
+bwaaaaaa  
+okay so yesterday we went for a school field trip to Vienna.  
+when we had a break we were sitting on a bench and i found a *four-leaf* clover, which
+i havent found in a loooong time and it should signify LUCK.  
+Well it fukcing didnt because when we were on the train back home i got a notification from instagram
+that they BANNED my account for being UNDER 13 (I AM NOT UNDER 13 BTW). So i went and filled an appeal.
+After like 10 minutes they responsed that they checked again and were sure i am under 13 (i uploaded my GOVERMENT ID
+to them and they still decided not). So i now dont have an instagram account and i lost contact with like 50 people because 
+instagram is the only thing i had of them.
+great
+i filled a CEAH case and im waiting
+to all the people that check here i love you i didnt forget of you and i miss you
+<3
+
 ## cedarwood state - 9.9.2026
 
 school is killing me we have like billion classes every day and we have 0th hour 3/5 days  
