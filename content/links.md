@@ -42,4 +42,4 @@ Not necessarelly sorted <3
 - [Devlog](#devlog)
 - [Stickers](./stickers/)
 - [valerie.vg](https://valerie.vg)
-- [My instagram <3](https://instagram.com/vpunpckldq)
+- [~~My instagram <3~~](https://instagram.com/vpunpckldq)

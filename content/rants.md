@@ -10,10 +10,10 @@ Well it fukcing didnt because when we were on the train back home i got a notifi
 that they BANNED my account for being UNDER 13 (I AM NOT UNDER 13 BTW). So i went and filled an appeal.
 After like 10 minutes they responsed that they checked again and were sure i am under 13 (i uploaded my GOVERMENT ID
 to them and they still decided not). So i now dont have an instagram account and i lost contact with like 50 people because 
-instagram is the only thing i had of them.
-great
-i filled a CEAH case and im waiting
-to all the people that check here i love you i didnt forget of you and i miss you
+instagram is the only thing i had of them.  
+great  
+i filled a CEAH case and im waiting  
+to all the people that check here i love you i didnt forget of you and i miss you  
 <3
 
 ## cedarwood state - 9.9.2026

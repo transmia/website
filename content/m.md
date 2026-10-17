@@ -1,21 +1,24 @@
 ## List
 
-- [vial](https://symphonylabs.cc/products/8e4686ff-6869-4196-92a8-1af995b8af8f) - 70$ -> 60€ LTC
-- [syringes](https://www.medicross.sk/striekacka-diconex-tuberkulin-1ml-3-dielna-luer-steril-100ks/) - 6€
-- [injection needle](https://www.medicross.sk/ihla-bd-microlance-25g-0-5x16mm-oranzova-100ks/) - 4€
-- [drawing needle](https://www.medicross.sk/ihla-bd-microlance-23g-0-6x25mm-modra-100ks/) - 5€
-- [sterile gauze (10bal)](https://www.medicross.sk/sterilkompres-sterilne-krytie-z-gazy-7-5x7-5cm-a10ks/) - 10bal => 4€
-- [prep pad](https://www.medicross.sk/alcohol-prep-pad-sterilny-tampon-s-alkoholom-65x30mm-100-ks-50-x-2-ks/) - 2€
-- [sharp container](https://www.medicross.sk/kontajner-na-pouzite-ihly-0-375l/) - 1€
-- [sand hanitizer](https://www.medicross.sk/vitasept-e75-gel-500-ml/) - 7€
+- [vial](https://astrovials.com/en/shop/estradiol-enanthate-mct) - 50€ + ~10€ shipping in BTC
+- [syringes with needle](https://www.medplus.sk/tuberkulinova-injekcna-striekacka-kd-ject-so-snimatelnou-ihlou-25g-0-5-x-16-mm-1-ml-100-ks/) - 11€
+- [sterile gauze](https://www.medplus.sk/kompresy-z-gazy-sterilne-5-x-5-cm-8vr-100-x-2-ks/) - 4€
+- [prep pad](https://www.medplus.sk/tampon-alkoholovy-pred-vpichom-injekcie-ap2584-100ks/) - 2€
+- [sharp container](https://www.medplus.sk/yannick-box-2-l/) - 2€
+- [sand hanitizer](https://www.medplus.sk/septoderm-gel-500-ml/) - 8€
 
 ## Cost
 
-60€ LTC + 29€ + shipping = 100€
+60€ LTC + 26€ + 5€ shipping = ~100€
+
+## Dosage
+
+4mg	0.1mL every 7 days subQ
 
 ## References
 
 - [valerie.vg](https://valerie.vg/)
-- [MtF HRT: Ultimate DIY](https://groups.io/g/MTFHRT/wiki/29602)
-- [medicross](https://medicross.sk)
+- [medplus](https://www.medplus.sk)
+- [Start with 4mg estradiol enanthate weekly, and test at one to three months](https://startwith4mgestradiolenanthateweeklyandtestatonetothreemonths.com/)
 - [How to Give a Subcutaneous Injection video from NewYork-Presbyterian (NYP)](https://www.nyp.org/healthlibrary/multimedia/how-to-give-a-subcutaneous-injection?lancode=)
+- [A Practical Guide To Feminizing Hrt](https://pghrt.diy/)
