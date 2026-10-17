@@ -20,6 +20,10 @@ please donntt
 
 **She/her** but you can use **any/all** (as in any i dont care not literally *any*)
 
+## your sexuality??
+
+finsexual (?) and demiromantic and not strictly monogamous
+
 ## What do you do?
 
 Im a programmerr i mainly use Rust the femboy lang and C, also im a student so nothing much  

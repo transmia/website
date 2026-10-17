@@ -43,3 +43,4 @@ Not necessarelly sorted <3
 - [Stickers](./stickers/)
 - [valerie.vg](https://valerie.vg)
 - [~~My instagram <3~~](https://instagram.com/vpunpckldq)
+- [Email: *meow49471 [at] gmail [dot] com*](mailto:meow49471&#64;gmail&#46;com)
