@@ -1,7 +1,7 @@
 ## List
 
 - [vial](https://astrovials.com/en/shop/estradiol-enanthate-mct) - 50€ + ~10€ shipping in BTC
-- [syringes with needle](https://www.medplus.sk/tuberkulinova-injekcna-striekacka-kd-ject-so-snimatelnou-ihlou-25g-0-5-x-16-mm-1-ml-100-ks/) - 11€
+- [syringes with needle](https://www.medplus.sk/injekcna-striekacka-bd-inzulinova-0-5-ml-u-100-30-g-x-8-mm-100-ks/) - 16€
 - [sterile gauze](https://www.medplus.sk/kompresy-z-gazy-sterilne-5-x-5-cm-8vr-100-x-2-ks/) - 4€
 - [prep pad](https://www.medplus.sk/tampon-alkoholovy-pred-vpichom-injekcie-ap2584-100ks/) - 2€
 - [sharp container](https://www.medplus.sk/yannick-box-2-l/) - 2€
@@ -9,7 +9,7 @@
 
 ## Cost
 
-60€ LTC + 26€ + 5€ shipping = ~100€
+60€ LTC + 32€ + 5€ shipping = ~100€
 
 ## Dosage
 
