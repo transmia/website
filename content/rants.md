@@ -1,5 +1,14 @@
 # RANTSS (or blog)
 
+## fjodor wodka yea - 11.11.2026
+
+sorry im writing this late this all happened on saturday (7.11)  
+yeah so stuff happened yesterday (saturday but ill refer to it as yesterday) i was like very depressive and stuff
+and i wanted to drink so i went and bought a vodka (it was on discount) and i drank it with my friends and well
+it was nice but i <span class="spoiler">kiiiiiiiiiiiiinda made out with my best friend</span> aand well after that 
+another friends brother came to pick us up and take home and i left my bag in his car qwq  
+yea thats all and idk how to feel about *that*
+
 ## october canon event - 16.10.2026
 
 bwaaaaaa  
@@ -27,11 +36,11 @@ subtle and had the stuff on the arms ikydk but just know it looked really cool a
 i had like 3 outfits planned with it already and it was like yk adrogenous so i couldve worn it to school normally and then just like 
 switch the belt and go with friends.
 why i just dont understand and it was cheap too i was like i would be a fool if i didnt take this deal.
-im so sad :(
+im so sad 3:
 
 ## last day of summer - 31.8.2026
 
-em it is yes we have to go to school tomorrow :(  
+em it is yes we have to go to school tomorrow 3:   
 and im fucking looking at pink shock collars on amazon
 what am i doing genuenly  
 
@@ -106,7 +115,7 @@ atleast my skin regenerates really good and i dont have any scars from it
 
 happy birthday to my classmate Igor  
 yeah em idk were getting home from stockholm tomorow soo yay i guess  
-and i found anri vinyl at the store but i didnt have money and when i came back with money they SOLD IT :(  
+and i found anri vinyl at the store but i didnt have money and when i came back with money they SOLD IT 3:  
 can you believe that
 also i wanted to buy tubular bells and they had them but they said they werent on sale :/  
 so i bought rick roll  
