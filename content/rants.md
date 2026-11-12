@@ -1,5 +1,11 @@
 # RANTSS (or blog)
 
+## I GOT MY IG BACK - 12.11.2026
+
+BWAAAA omg im so happy CEAH actually did something and i got unbanned!!!  
+i can be a dysfunctioning part of the society again!!  
+okie well and thats all and ehm yeah and also i think im in love with her  
+
 ## fjodor wodka yea - 11.11.2026
 
 sorry im writing this late this all happened on saturday (7.11)  
