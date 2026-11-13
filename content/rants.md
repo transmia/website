@@ -1,5 +1,13 @@
 # RANTSS (or blog)
 
+## friday 13th - 13.11.2026
+
+do u remember saturday? it happened again  
+we bought the same vodka again aaand we made out again like bwaaa  
+atp the alcohol is just an excuse  
+also happy friday the 13th i guess  
+idk im conflicted on my feelings  
+
 ## I GOT MY IG BACK - 12.11.2026
 
 BWAAAA omg im so happy CEAH actually did something and i got unbanned!!!  
